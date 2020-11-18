@@ -33,7 +33,7 @@ class GraphCreater:
                 search_node = self.graph.run("match (p:部队) where p.name='%s' return p.部队内码, p.直属上级"
                                              % orgs_data['部队名称'][i]).data()[0]
                 node = {'部队内码': search_node['p.部队内码'],
-                        '直属上级': search_node['p.直属上级'],}
+                        '直属上级': search_node['p.直属上级'], }
 
             # 绘制部队之间的隶属关系
             create_relation(self.graph, '部队', '部队', node['直属上级'], node['部队内码'])
@@ -95,7 +95,6 @@ class GraphCreater:
             # 本端台站至线路的连接
             create_relation(self.graph, '台站', '线路', station_name, stations_data['线路名称'][i])
             # 对端台站到线路的连接
-            # create_node(self.graph, '台站', {'name': stations_data['通达方向'][i]})
             create_relation(self.graph, '台站', '线路', stations_data['通达方向'][i], stations_data['线路名称'][i])
             # 台站到台站之间的连接
             create_relation(self.graph, '台站', '台站', station_name, stations_data['通达方向'][i])
@@ -110,7 +109,6 @@ class GraphCreater:
                 create_node(self.graph, '系统', {'name': system})
                 create_relation(self.graph, '台站', '系统', station_name, system)
                 create_relation(self.graph, '线路', '系统', stations_data['线路名称'][i], system)
-
 
             # 建立中继节点
             relays = str(stations_data['中继站'][i]).split('、')
@@ -133,11 +131,20 @@ class GraphCreater:
             create_node(self.graph, '设备',
                         {'name': equips_data['设备类型'][i],
                          '名称': equips_data['设备名称'][i],
-                         '编码': equips_data['设备编码'][i]})
+                         '编码': equips_data['设备编码'][i]},
+                        overwrite=False)
 
+            # 建立台站到设备的连接
             create_relation(self.graph, '台站', '设备', station_name, equips_data['设备编码'][i], sub_key='编码')
-
-
+            # 建立设备到设备的连接
+            for equ in str(equips_data['连接设备'][i]).split('、'):
+                if equ == '' or equ == 'nan':
+                    continue
+                create_relation(self.graph, '设备', '设备', equips_data['设备编码'][i],
+                                int(equ), main_key='编码', sub_key='编码', newnode=False)
+            # 建立设备到线路的连接
+            for route in equips_data['连接路由'][i].split('、'):
+                create_relation(self.graph, '设备', '线路', equips_data['设备编码'][i], route, main_key='编码')
 
     def clear_graph(self):
         '''
@@ -147,7 +154,6 @@ class GraphCreater:
         self.graph.run('match(n) detach delete n')
 
         return None
-
 
 
 if __name__ == '__main__':
