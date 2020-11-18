@@ -54,7 +54,7 @@ class GraphCreater:
 
     def __initialize_station(self, station_dir):
         try:
-            station_info = pd.read_csv(os.path.join(station_dir, 'station_info.csv'), encoding='gbk')
+            station_info = pd.read_csv(os.path.join(station_dir, '台站.csv'), encoding='gbk')
         except FileNotFoundError:
             return None
 
@@ -78,7 +78,7 @@ class GraphCreater:
         :return:
         '''
         try:
-            stations_data = pd.read_csv(os.path.join(station_dir, 'routes.csv'), encoding='gbk')
+            stations_data = pd.read_csv(os.path.join(station_dir, '路由.csv'), encoding='gbk')
         except FileNotFoundError:
             return None
 
@@ -122,7 +122,7 @@ class GraphCreater:
 
     def __initialize_equips(self, station_dir, station_name):
         try:
-            equips_data = pd.read_csv(os.path.join(station_dir, 'equips.csv'), encoding='gbk')
+            equips_data = pd.read_csv(os.path.join(station_dir, '设备.csv'), encoding='gbk')
         except FileNotFoundError:
             return None
 
